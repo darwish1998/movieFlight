@@ -1,34 +1,51 @@
-const fetchData = async (searchTerm) => {
-    const response = await axios.get('http://www.omdbapi.com',
-    {
-        params: {
-            apikey: 'ccfc0141',
-            s: searchTerm
-        }
-    });
-    if(response.data.Error) {
-        return [];
-    }
-    return response.data.Search;
-};
+const autoCompleteConfig = {
+  renderOption(movie) {
+    const imgSrc = movie.Poster === 'N/A' ?  '' : movie.Poster;
+    return  `
+    <img src ="${imgSrc}"/img>
+    ${movie.Title} (${movie.Year})
+   `; 
+    },
+    inputValue(movie) {
+      return movie.Title;
+    },
+    async fetchData  (searchTerm) {
+      const response = await axios.get('http://www.omdbapi.com',
+      {
+          params: {
+              apikey: 'ccfc0141',
+              s: searchTerm
+          }
+      });
+      if(response.data.Error) {
+          return [];
+      }
+      return response.data.Search;
+  }
+}
 
 createAutocomplete({
-  root : document.querySelector('.autocomplete'),
-  renderOption(movie) {
-  const imgSrc = movie.Poster === 'N/A' ?  '' : movie.Poster;
-  return  `
-  <img src ="${imgSrc}"/img>
-  ${movie.Title} (${movie.Year})
- `; 
-  },
+  ...autoCompleteConfig,
+  root : document.querySelector('#left-autocomplete'),
   onOptionSelect(movie) {
-    onMovieSelect(movie);
+    document.querySelector('.tutorial').classList.add('is-hidden');
+    onMovieSelect(movie,document.querySelector('#left-summery'));
   },
-  inputValue(movie) {
-    return movie.Title;
-  }
+
+
+}),
+createAutocomplete({
+  ...autoCompleteConfig,
+  root : document.querySelector('#right-autocomplete'),
+  onOptionSelect(movie) {
+    document.querySelector('.tutorial').classList.add('is-hidden');
+    onMovieSelect(movie,document.querySelector('#right-summery'));
+  },
+
+
+
 });
-const onMovieSelect = async movie =>  {
+const onMovieSelect = async (movie, summaryElement) =>  {
   const response = await axios.get('http://www.omdbapi.com',
   {
        params: {
@@ -36,12 +53,11 @@ const onMovieSelect = async movie =>  {
           i: movie.imdbID
       }
   });
-  document.querySelector('#summery').innerHTML = movieTemplate(response.data);
-  
+  summaryElement.innerHTML=movieTemplate(response.data);
 };
 
-const movieTemplate = (movieDetail) => {
-    return `
+function movieTemplate(movieDetail) {
+  return `
     <article class="media">
     <figure class="media-left">
       <p class="image">
@@ -82,4 +98,4 @@ const movieTemplate = (movieDetail) => {
   </article>
   
     `;
-};
+}
