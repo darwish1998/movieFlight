@@ -1,9 +1,10 @@
-const createAutocomplete = ({ 
+const createAutocomplete = (
+    { 
     root,
-     renderOption,
-     onOptionSelect,
-     inputValue,
-     fetchData,
+    renderOption,
+    onOptionSelect,
+    inputValue,
+    fetchData,
      }) => {
     
     root.innerHTML = `
@@ -45,7 +46,7 @@ dropdown.classList.add('is-active');
    }
 };
 
-input.addEventListener('input',debounce(onInPut,500));
+input.addEventListener(' input ',debounce(onInPut,500));
 
 document.addEventListener('click', event => {
    if(!root.contains(event.target)) {
